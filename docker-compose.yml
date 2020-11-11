@@ -33,4 +33,3 @@ services:
     command: tail -f /dev/null
     volumes:
       - ./sap_web:/app/sap_web
-      - ${MEDIA_VOLUME}:/app/media
