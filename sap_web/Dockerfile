@@ -18,4 +18,7 @@ COPY . .
 RUN mkdir /app/media
 RUN mkdir /app/database
 
-#RUN poetry install --no-interaction --no-ansi
+RUN poetry install --no-interaction --no-ansi
+
+RUN chmod +x /app/sap_web/entrypoint.sh
+ENTRYPOINT ["/app/sap_web/entrypoint.sh"]
