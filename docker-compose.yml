@@ -33,3 +33,18 @@ services:
     command: tail -f /dev/null
     volumes:
       - ./sap_web:/app/sap_web
+    depends_on:
+      - sap_db
+  
+  sap_proxy:
+    env_file: ./.env
+    image: sap/sap_proxy
+    build:
+        context: ./sap_proxy
+    container_name: sap_proxy
+    networks:
+        - sap_net
+    ports:
+        - "${HOST_HTTP_PORT}:80"
+    depends_on:
+        - sap_web
