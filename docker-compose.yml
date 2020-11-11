@@ -4,19 +4,33 @@ networks:
     sap_net:
         driver: bridge
 services:
-    sap_web:
-        env_file: ./.env
-        image: sap/sap_web
-        build:
-            context: ./sap_web
-        container_name: sap_web
-        ports:
-            - "${HOST_HTTP_DEV_PORT}:8000"
-        networks:
-            - sap_net
-        #entrypoint: ["sh","/app/sap_web/entrypoint.sh"]
-        command: tail -f /dev/null
-        volumes:
-            - ./sap_web:/app/sap_web
-            - ${STATICS_VOLUME}:/app/statics
-            - ${MEDIA_VOLUME}:/app/media
+  sap_db:
+    env_file: ./.env
+    image: postgres:alpine
+    container_name: sap_db
+    restart: always
+    environment:
+      - POSTGRES_DB=${DATABASE_NAME}
+      - POSTGRES_PORT=${DATABASE_PORT}
+      - POSTGRES_USER=${DATABASE_USER}
+      - POSTGRES_PASSWORD=${DATABASE_PASSWORD}
+    networks:
+      - sap_net
+    volumes:
+      - ${DATABASE_VOLUME}:/var/lib/postgresql/data
+      
+  sap_web:
+    env_file: ./.env
+    image: sap/sap_web
+    build:
+      context: ./sap_web
+    container_name: sap_web
+    ports:
+      - "${HOST_HTTP_DEV_PORT}:8000"
+    networks:
+      - sap_net
+    #entrypoint: ["sh","/sap/sap_web/entrypoint.sh"]
+    command: tail -f /dev/null
+    volumes:
+      - ./sap_web:/app/sap_web
+      - ${MEDIA_VOLUME}:/app/media

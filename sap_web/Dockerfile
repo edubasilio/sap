@@ -17,6 +17,5 @@ COPY . .
 
 RUN mkdir /app/media
 RUN mkdir /app/database
-RUN mkdir /app/statics
 
-RUN poetry install --no-interaction --no-ansi
+#RUN poetry install --no-interaction --no-ansi

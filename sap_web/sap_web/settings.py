@@ -11,9 +11,13 @@ https://docs.djangoproject.com/en/3.1/ref/settings/
 """
 import os
 import sys
-
-
 from pathlib import Path
+
+from decouple import config
+
+
+# set multistage
+ENVIRONMENT = config("ENVIRONMENT", default="PROD")
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
@@ -26,12 +30,12 @@ sys.path.insert(0,  APPS_DIR)
 # See https://docs.djangoproject.com/en/3.1/howto/deployment/checklist/
 
 # SECURITY WARNING: keep the secret key used in production secret!
-SECRET_KEY = 'dxk8k^b83_zxy*z8zg7q9&-k^8ka1r5k!9-g#7zo=sh736e!ey'
+SECRET_KEY = config('SECRET_KEY')
 
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = True
+DEBUG = False if ENVIRONMENT == "PROD" or ENVIRONMENT == "STAG" else True
 
-ALLOWED_HOSTS = []
+ALLOWED_HOSTS = config("ALLOWED_HOSTS", cast=lambda v: {s.replace('*.','.') for s in v.split(" ")})
 
 
 # Application definition
@@ -45,6 +49,8 @@ INSTALLED_APPS = [
     'django.contrib.staticfiles',
     'entities.apps.EntitiesConfig',
     'datacollector.apps.DatacollectorConfig',
+    # third-aprty libraries
+    # local apps
 ]
 
 MIDDLEWARE = [
@@ -62,7 +68,10 @@ ROOT_URLCONF = 'sap_web.urls'
 TEMPLATES = [
     {
         'BACKEND': 'django.template.backends.django.DjangoTemplates',
-        'DIRS': [],
+        'DIRS': [
+            os.path.join(BASE_DIR, 'statics'),
+            os.path.join(BASE_DIR, 'statics/html'),
+        ],
         'APP_DIRS': True,
         'OPTIONS': {
             'context_processors': [
@@ -83,8 +92,12 @@ WSGI_APPLICATION = 'sap_web.wsgi.application'
 
 DATABASES = {
     'default': {
-        'ENGINE': 'django.db.backends.sqlite3',
-        'NAME': BASE_DIR / 'db.sqlite3',
+        'ENGINE': 'django.db.backends.postgresql',
+        'NAME': config('DATABASE_NAME'),
+        'USER': config('DATABASE_USER'),
+        'PASSWORD': config('DATABASE_PASSWORD'),
+        'HOST': config('DATABASE_HOST', 'sap_db'),
+        'PORT': config('DATABASE_PORT', 5432),
     }
 }
 
@@ -113,7 +126,7 @@ AUTH_PASSWORD_VALIDATORS = [
 
 LANGUAGE_CODE = 'pt-br'
 
-TIME_ZONE = 'UTC'
+TIME_ZONE = 'America/Sao_Paulo'
 
 USE_I18N = True
 
